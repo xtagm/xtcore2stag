@@ -55,6 +55,7 @@ var stat_stag =
     },
     /**
      * Cookie mode setting 
+     * @param {boolean} nocookie Optional: Cookie opt-out? (does nothing if not provided)
      */
     initCookie : function(nocookie)
     {
@@ -227,7 +228,7 @@ var stat_stag =
         }
     },
     /**
-     * Create a Json structure from a conventional name
+     * Create a Json structure from a conventional name, add Level2 if any currently defined at global level
      * @param {string} lname Page or Event name  
      **/        
     jsonName : function(lname)
@@ -246,6 +247,7 @@ var stat_stag =
     },  
     /**
      * Get a converted click type 
+     * @param {string} type T, N, E...any other value will be interpreted as Action  
      */
     clickType : function(type)
     {
@@ -267,8 +269,12 @@ var stat_stag =
     },
 
     /**
-     * Send Click Tag
-     **/       
+     * Send click tag
+     * @param {string} lname Click tag name
+     * @param {string} type Click tag type ('N', 'S', 'T', 'A')
+     * @param {object} node Node that raises the click tag
+     * @param {object} e Current event
+     */       
     sendClick:function(lname, type, node, e)
     {
         stat_stag.initCheck();
@@ -303,8 +309,25 @@ var stat_stag =
     },
 
     /**
-     * Send Rich Media Tag for Video
-     **/       
+     * Send Rich Media Tag for Youtube Video
+     * @param {string} A Compulsory - content type ("video", "audio" or "vpost" for the measurement of post-roll videos). The content type must be concatenated to the variable "&plyr=", which contains the ID of the reader that is currently being used (refer to the example below). The variable "&plyr=" is optional but must be added when several readers are used, the aim of this is to distinguish between the hits that are received by the different readers.
+     * @param {string} B Level 2 site in which the content is placed.
+     * @param {string} C Compulsory - content label (use "::" if necessary) or post-roll advertisement label (in this case do not use the "::"). The label which is used for a post-roll advertisement must be concatenated to the variable "&clnk=". The "&clnk=" variable needs to resume the video content that the advertisement is linked to (refer to the example below).
+     * @param {string} E Not used 
+     * @param {string} D Compulsory - action (predefined ID)
+     * @param {string} F Refresh count duration (optional and measured in seconds, but necessary to calculate detailed durations). This is a fixed duration, and a minimum interval value of 5 seconds applies.
+     * @param {string} G Compulsory (except if D is different from "play" or if L = "Live"):Total content duration is measured in seconds (to be left empty if L="live"). Must be less than 86400.
+     * @param {string} H Information relating to the position of the playcount ("rmp", "rmpf" and "rmbufp"), measured in seconds. These three variables, which are to be concatenated, need to be entered as follows: "rmp=0&rmpf=0&rmbufp=0" (0 is the default value).
+                         - rmp (rich media position): position of the read head. This value must be updated for each action (variable D).
+                         - rmpf (rich media position from): the starting position of the read head along the playback bar. This value must be updated for each action (if variable D="move").
+                         - rmbufp (rich media buffer cache position: the position of the cache's progress bar which is present in the content. This value must be updated for each action (variable D)
+     * @param {string} J Feed ID
+     * @param {string} K Location ("int" or "ext").
+     * @param {string} L Broadcast ("live" or "clip"). If L is empty the method which is taken into consideration for broadcasting is "clip".
+     * @param {string} M Content size (integer in Kb, leave empty if L="live").
+     * @param {string} N Content format (ID predefined by you). 
+     * @param {string} event Youtube event    
+     **/  
     sendVideo:function(A,B,C,D,E,F,G,H,I,J,K,L,M,N,event)
     {
         stat_stag.initCheck();
@@ -351,7 +374,11 @@ var stat_stag =
     
     /**
      * Product impression
-     */       
+     * @param {string} pRef Product Reference
+     * @param {string} pName Product Name
+     * @param {string} catRef Category Reference
+     * @param {string} catName Category Name
+     **/        
     productView: function(pRef, pName, catRef, catName)
     {
         if (stat_stag.tag && stat_stag.tag.product && pRef)
@@ -367,6 +394,7 @@ var stat_stag =
   
     /**
      * Product adding
+     * @param {object} product Json object with fields: ID, Description, Quantity Category, UnitPriceTF, UnitPriceTI, DiscountTI, DiscountTF
      */ 
     addProduct:function(product) 
     {
@@ -449,11 +477,18 @@ var stat_stag =
     };
 })();
 
-/**
+/**************************************************************************************************************
  *  Content page tag trigger
- *  To include in a Tag Manager, preferably:
- *  - Split the code above to be included in earlier in page (just after smarttag.js), 
- *  - Add the lines belows instead of xtcore.js inclusion
+ *  ------------------------
+ *  To include in a Tag Manager, of if you have clicks to raise before page tag, you can:
+ *  - Split the code above to be included in earlier in page (just after smarttag.js), as a Custom HTML 
+ *  - Add another Custom HTML with the lines below, instead of xtcore.js inclusion
+ *    Or
+ *  - Split the code above, and add it this instruction: stat_stag.init();
+ *    Such init can be possibly controlled with some options (for example to manage cookie opt-out), then it will be included the same way.
+ *  - Add another Custom HTML with just stat_stag.sendPage(); instead of xtcore.js inclusion
+ *  
+ * 
  */
 (function()
 {
