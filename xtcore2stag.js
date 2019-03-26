@@ -451,6 +451,9 @@ var stat_stag =
 
 /**
  *  Content page tag trigger
+ *  To include in a Tag Manager, preferably:
+ *  - Split the code above to be included in earlier in page (just after smarttag.js), 
+ *  - Add the lines belows instead of xtcore.js inclusion
  */
 (function()
 {
