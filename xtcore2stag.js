@@ -1,7 +1,7 @@
 /**
  * @license @title XTag Manager: AT Internet SmartTag Adapter
  * @author DENIS ROUSSEAU
- * @version 8.2.0
+ * @version 8.2.1
  */
 /*jslint nomen: true, plusplus: true, vars: true, evil: true, regexp: true*/
 
@@ -86,6 +86,20 @@ var stat_stag =
         var p=0;
         return (window.xtsd && xtsd.indexOf('.')>0)?'':((!window.xtsd || ((p=xtsd.indexOf('log'))>=0 && xtsd.charAt(p+3)!=='w'))?'.xiti.com':'.ati-host.net')  ;
     },
+    /**
+     * Retrieve parameter parser in given URL (parameters can be retrieved in lowercase)
+     * @param {string} surl URL to parse
+     * @return {object} The map which contains parsed parameters. Use as object[parameter], with parameter in lower case
+     */
+    getUrlParser : function(surl)
+    {
+        var osurl = {};
+        surl.replace(new RegExp("([^?=&]+)(=([^&]*))?", "g"), function(b, a, d, c)
+        {
+            osurl[a.toLowerCase()] = c;
+        });
+        return osurl;
+    },    
     /**
      * Parse xtcore parameters to make them SmartTag settings.  
      **/     
@@ -270,7 +284,7 @@ var stat_stag =
         case 'IS':
             if (stat_stag.tag.internalSearch)
             {
-                jp=getUrlParser(lname);
+                jp=stat_stag.getUrlParser(lname);
                 if (jp && jp.mc && !isNaN(jp.np) && !isNaN(jp.mcrg))
                 {
                     stat_stag.tag.internalSearch.send({elem:node,keyword:jp.mc,resultPageNumber:jp.np,resultPosition:jp.mcrg});
